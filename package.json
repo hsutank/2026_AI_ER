@@ -1,0 +1,10 @@
+{
+  "name": "financial-backtester-dashboard-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:backend": "backend/.venv/Scripts/uvicorn main:app --app-dir backend --reload --port 8000",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev": "npx concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+  }
+}

@@ -1,0 +1,12 @@
+runtime: python310
+instance_class: F1
+
+automatic_scaling:
+  min_instances: 0
+  max_instances: 3
+  target_cpu_utilization: 0.75
+
+entrypoint: uvicorn main:app --host 0.0.0.0 --port $PORT
+
+env_variables:
+  GOOGLE_SHEETS_ID: "10O_CeRq9X7CzIDkCNhJQRUGLjt7c3lkDVVaf1WjSxzw"
