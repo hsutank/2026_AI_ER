@@ -362,9 +362,16 @@ def create_storage() -> Optional[SheetsStorage]:
     """
     spreadsheet_id = os.environ.get("GOOGLE_SHEETS_ID")
     credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    creds_json_str = os.environ.get("GOOGLE_CREDENTIALS_JSON")
+
+    print(f"[DIAGNOSTIC] GOOGLE_SHEETS_ID: {spreadsheet_id}", flush=True)
+    print(f"[DIAGNOSTIC] GOOGLE_APPLICATION_CREDENTIALS: {credentials_path}", flush=True)
+    print(f"[DIAGNOSTIC] GOOGLE_CREDENTIALS_JSON present: {bool(creds_json_str)}", flush=True)
+    if creds_json_str:
+        print(f"[DIAGNOSTIC] GOOGLE_CREDENTIALS_JSON prefix: {creds_json_str[:20]}...", flush=True)
 
     if not spreadsheet_id:
-        logger.warning("GOOGLE_SHEETS_ID not set. Google Sheets storage disabled.")
+        print("[DIAGNOSTIC] GOOGLE_SHEETS_ID not set. Google Sheets storage disabled.", flush=True)
         return None
 
     try:
@@ -372,8 +379,8 @@ def create_storage() -> Optional[SheetsStorage]:
             spreadsheet_id=spreadsheet_id,
             credentials_path=credentials_path
         )
-        logger.info(f"Google Sheets storage initialized (ID: {spreadsheet_id})")
+        print(f"[DIAGNOSTIC] Google Sheets storage successfully initialized (ID: {spreadsheet_id})", flush=True)
         return storage
     except Exception as e:
-        logger.error(f"Failed to initialize Google Sheets storage: {e}")
+        print(f"[DIAGNOSTIC] Failed to initialize Google Sheets storage: {e}", flush=True)
         return None

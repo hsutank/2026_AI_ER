@@ -46,11 +46,12 @@ sheets: Optional[SheetsStorage] = None
 def startup_event():
     """Initialize Google Sheets storage on app startup."""
     global sheets
+    print("[DIAGNOSTIC] App starting up. Initializing storage...", flush=True)
     sheets = create_storage()
     if sheets:
-        logger.info("✓ Google Sheets storage initialized — all data will be stored in Sheets.")
+        print("[DIAGNOSTIC] Google Sheets storage successfully initialized in main.py!", flush=True)
     else:
-        logger.warning("✗ Google Sheets unavailable. API will return errors for storage operations.")
+        print("[DIAGNOSTIC] Google Sheets storage initialization returned None in main.py.", flush=True)
 
 
 # =========================================================================
