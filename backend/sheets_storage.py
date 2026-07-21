@@ -53,11 +53,21 @@ class SheetsStorage:
         creds_json_str = os.environ.get("GOOGLE_CREDENTIALS_JSON")
         if creds_json_str:
             try:
-                creds_info = json.loads(creds_json_str)
+                import base64
+                creds_json_str_clean = creds_json_str.strip()
+                try:
+                    # Try Base64 decoding first
+                    decoded = base64.b64decode(creds_json_str_clean).decode("utf-8")
+                    creds_info = json.loads(decoded)
+                    logger.info("Authenticated using Base64-decoded GOOGLE_CREDENTIALS_JSON.")
+                except Exception:
+                    # Fallback to plain JSON parsing
+                    creds_info = json.loads(creds_json_str)
+                    logger.info("Authenticated using plain GOOGLE_CREDENTIALS_JSON.")
+                
                 creds = service_account.Credentials.from_service_account_info(
                     creds_info, scopes=SCOPES
                 )
-                logger.info("Authenticated using GOOGLE_CREDENTIALS_JSON environment variable.")
             except Exception as e:
                 logger.error(f"Failed to load credentials from GOOGLE_CREDENTIALS_JSON: {e}")
                 creds = None
