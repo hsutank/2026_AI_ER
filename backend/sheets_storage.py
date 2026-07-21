@@ -54,21 +54,28 @@ class SheetsStorage:
         if creds_json_str:
             try:
                 import base64
-                creds_json_str_clean = creds_json_str.strip()
+                import re
+                
+                # Clean up any surrounding quotes, whitespace, or newlines
+                creds_clean = creds_json_str.strip().strip('"').strip("'")
+                creds_no_whitespace = re.sub(r'\s+', '', creds_clean)
+                
                 try:
-                    # Try Base64 decoding first
-                    decoded = base64.b64decode(creds_json_str_clean).decode("utf-8")
+                    # Try Base64 decoding
+                    decoded = base64.b64decode(creds_no_whitespace).decode("utf-8")
                     creds_info = json.loads(decoded)
-                    logger.info("Authenticated using Base64-decoded GOOGLE_CREDENTIALS_JSON.")
-                except Exception:
+                    print("[DIAGNOSTIC] Successfully decoded and parsed GOOGLE_CREDENTIALS_JSON via Base64!", flush=True)
+                except Exception as b64_err:
+                    print(f"[DIAGNOSTIC] Base64 decode/parse failed: {b64_err}. Trying plain JSON parse...", flush=True)
                     # Fallback to plain JSON parsing
                     creds_info = json.loads(creds_json_str)
-                    logger.info("Authenticated using plain GOOGLE_CREDENTIALS_JSON.")
+                    print("[DIAGNOSTIC] Successfully parsed GOOGLE_CREDENTIALS_JSON as plain JSON!", flush=True)
                 
                 creds = service_account.Credentials.from_service_account_info(
                     creds_info, scopes=SCOPES
                 )
             except Exception as e:
+                print(f"[DIAGNOSTIC] Failed to load credentials from GOOGLE_CREDENTIALS_JSON: {e}", flush=True)
                 logger.error(f"Failed to load credentials from GOOGLE_CREDENTIALS_JSON: {e}")
                 creds = None
         elif credentials_path and os.path.exists(credentials_path):
