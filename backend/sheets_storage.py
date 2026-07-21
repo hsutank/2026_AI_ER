@@ -58,9 +58,14 @@ class SheetsStorage:
                 
                 # Clean up any surrounding quotes, carriage returns, newlines, and tabs
                 creds_clean = creds_json_str.strip().strip('"').strip("'")
-                creds_no_newlines = re.sub(r'[\r\n\t]+', '', creds_clean)
                 
-                # Convert spaces back to '+' (handles browser/Render URL-encoding conversions)
+                # Unquote URL-encoded characters (like %2F -> /, %3D -> =, %2B -> +)
+                import urllib.parse
+                creds_unquoted = urllib.parse.unquote(creds_clean)
+                
+                creds_no_newlines = re.sub(r'[\r\n\t]+', '', creds_unquoted)
+                
+                # Convert spaces back to '+' (handles browser/Render URL-encoding conversions where + became space)
                 creds_restored = creds_no_newlines.replace(' ', '+')
                 
                 try:
