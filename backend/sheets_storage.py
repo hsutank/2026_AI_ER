@@ -56,13 +56,16 @@ class SheetsStorage:
                 import base64
                 import re
                 
-                # Clean up any surrounding quotes, whitespace, or newlines
+                # Clean up any surrounding quotes, carriage returns, newlines, and tabs
                 creds_clean = creds_json_str.strip().strip('"').strip("'")
-                creds_no_whitespace = re.sub(r'\s+', '', creds_clean)
+                creds_no_newlines = re.sub(r'[\r\n\t]+', '', creds_clean)
+                
+                # Convert spaces back to '+' (handles browser/Render URL-encoding conversions)
+                creds_restored = creds_no_newlines.replace(' ', '+')
                 
                 try:
                     # Try Base64 decoding
-                    decoded = base64.b64decode(creds_no_whitespace).decode("utf-8")
+                    decoded = base64.b64decode(creds_restored).decode("utf-8")
                     creds_info = json.loads(decoded)
                     print("[DIAGNOSTIC] Successfully decoded and parsed GOOGLE_CREDENTIALS_JSON via Base64!", flush=True)
                 except Exception as b64_err:
